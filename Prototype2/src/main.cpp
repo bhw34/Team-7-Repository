@@ -1,3 +1,7 @@
+/*
+This protype opens the latch and door motor. This is done using 2 servos one for the latch, which opens first and one for the door which opens second.
+*/
+
 #include <Arduino.h>
 #include <ESP32Servo.h>
 

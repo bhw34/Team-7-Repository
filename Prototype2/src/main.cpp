@@ -2,7 +2,7 @@
 #include <ESP32Servo.h>
 
 // This initializes the output pins for both the servos
-const int LATCH_SERVO_PIN = A0; // Latch Servo Pin
+const int LATCH_SERVO_PIN = A2; // Latch Servo Pin
 const int DOOR_SERVO_PIN = A1; // Door Servo Pin
 
 // Initializes the servos
@@ -32,7 +32,7 @@ void setup() {
 
 }
 
-    delay(10000); // Sets delay for robot cleaning cycle
+void loop() {
 
     latchServo.write(openAngle); // turns the latch servo 90 degrees
 
@@ -40,4 +40,7 @@ void setup() {
     
     doorServo.write(openAngle); // opens the door
 
-    doorOpen = true; // sets door condition to open
+    // doorOpen = true; // sets door condition to open
+
+    delay(2000); // Sets delay for robot cleaning cycle
+}

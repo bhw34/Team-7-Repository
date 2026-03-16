@@ -1,45 +1,24 @@
+/*
+  This code reads the digital value from a Infrared obstacle avoidance sensor connected to 
+  pin 25 and prints it to the serial monitor every 50 milliseconds.
+  When the module detects obstacles ahead, the red indicator light on the module will 
+  illuminate and the OUT port will continuously output a low-level signal.
+
+  Board: ESP32 Development Board
+  Component: Infrared obstacle avoidance sensor
+*/
 #include <Arduino.h>
-#include <ESP32Servo.h>
 
-// This initializes the output pins for both the servos
-const int LATCH_SERVO_PIN = A0; // Latch Servo Pin
-const int DOOR_SERVO_PIN = A1; // Door Servo Pin
-
-// Initializes the servos
-Servo latchServo;
-Servo doorServo;
-
-int closeAngle = 0; // Initializes int to store starting servo position
-int openAngle = 90; // Initializes int to store open servo position
-bool doorOpen = false; // Door is closed
-
-
+// Define the pin numbers for the Infrared obstacle avoidance sensor
+const int sensorPin = A0;
 
 void setup() {
-    Serial.begin(115200);
-
-    // Set pin modes
-    pinMode(LATCH_SERVO_PIN, OUTPUT);
-    pinMode(DOOR_SERVO_PIN, OUTPUT);
-
-    // Attach servos
-    latchServo.attach(LATCH_SERVO_PIN);
-    doorServo.attach(DOOR_SERVO_PIN);
-
-    // Write start position
-    latchServo.write(closeAngle);
-    doorServo.write(closeAngle);
-
+  pinMode(sensorPin, INPUT);  // Set sensorPin as input
+  Serial.begin(115200);         // Start serial communication at 9600 baud rate
 }
 
-    delay(10000); // Sets delay for robot cleaning cycle
-
-    latchServo.write(openAngle); // turns the latch servo 90 degrees
-
-    delay(2000); // Delay, door cant open till latch is open
-    
-    doorServo.write(openAngle); // opens the door
-
-    doorOpen = true; // sets door condition to open
-
-
+void loop() {
+  // Reads 0 and light turns on if object is detected
+  Serial.println(digitalRead(sensorPin));  // Read the digital value from the sensor and print it to the serial monitor
+  delay(50);
+}

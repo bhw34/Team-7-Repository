@@ -2,8 +2,8 @@
 #include <ESP32Servo.h>
 
 // This initializes the output pins for both the servos
-const int LATCH_SERVO_PIN = A2; // Latch Servo Pin
-const int DOOR_SERVO_PIN = A1; // Door Servo Pin
+const int LATCH_SERVO_PIN = A1; // Latch Servo Pin
+const int DOOR_SERVO_PIN = A0; // Door Servo Pin
 
 // Initializes the servos
 Servo latchServo;
@@ -16,6 +16,7 @@ bool doorOpen = false; // Door is closed
 
 
 void setup() {
+    Serial.begin(115200);
     Serial.begin(115200);
 
     // Set pin modes

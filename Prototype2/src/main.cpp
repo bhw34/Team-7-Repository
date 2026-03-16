@@ -1,47 +1,45 @@
 #include <Arduino.h>
 #include <ESP32Servo.h>
 
-// This initializes the output pins for both the servos
-const int LATCH_SERVO_PIN = A1; // Latch Servo Pin
-const int DOOR_SERVO_PIN = A0; // Door Servo Pin
 
-// Initializes the servos
+const int LATCH_SERVO_PIN = A1; 
+const int DOOR_SERVO_PIN = A0; 
+
 Servo latchServo;
 Servo doorServo;
 
-int closeAngle = 0; // Initializes int to store starting servo position
-int openAngle = 90; // Initializes int to store open servo position
-bool doorOpen = false; // Door is closed
-
-
+int closeAngle = 0;
+int openAngle = 90;
 
 void setup() {
     Serial.begin(115200);
-    Serial.begin(115200);
 
-    // Set pin modes
-    pinMode(LATCH_SERVO_PIN, OUTPUT);
-    pinMode(DOOR_SERVO_PIN, OUTPUT);
+    // Force the ESP32 to set aside independent hardware timers
+    ESP32PWM::allocateTimer(0);
+    ESP32PWM::allocateTimer(1);
 
-    // Attach servos
-    latchServo.attach(LATCH_SERVO_PIN);
-    doorServo.attach(DOOR_SERVO_PIN);
+    // 2. Set the frequency (Standard servos are 50Hz)
+    latchServo.setPeriodHertz(50);
+    doorServo.setPeriodHertz(50);
 
-    // Write start position
+    // 3. Attach using the full parameter list (Pin, Min, Max)
+    // The ESP32 often needs the 500-2400 microsecond range explicitly defined
+    if (!latchServo.attach(LATCH_SERVO_PIN, 500, 2400)) {
+        Serial.println("Latch Servo failed to attach");
+    }
+    if (!doorServo.attach(DOOR_SERVO_PIN, 500, 2400)) {
+        Serial.println("Door Servo failed to attach");
+    }
+
     latchServo.write(closeAngle);
     doorServo.write(closeAngle);
-
 }
 
 void loop() {
-
-    latchServo.write(openAngle); // turns the latch servo 90 degrees
-
-    delay(2000); // Delay, door cant open till latch is open
+    delay(2000);
+    latchServo.write(openAngle); 
     
-    doorServo.write(openAngle); // opens the door
+    delay(2000); 
+    doorServo.write(openAngle); 
 
-    // doorOpen = true; // sets door condition to open
-
-    delay(2000); // Sets delay for robot cleaning cycle
 }

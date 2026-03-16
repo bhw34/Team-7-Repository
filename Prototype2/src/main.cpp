@@ -1,18 +1,43 @@
 #include <Arduino.h>
+#include <ESP32Servo.h>
 
-// put function declarations here:
-int myFunction(int, int);
+// This initializes the output pins for both the servos
+const int LATCH_SERVO_PIN = A0; // Latch Servo Pin
+const int DOOR_SERVO_PIN = A1; // Door Servo Pin
+
+// Initializes the servos
+Servo latchServo;
+Servo doorServo;
+
+int closeAngle = 0; // Initializes int to store starting servo position
+int openAngle = 90; // Initializes int to store open servo position
+bool doorOpen = false; // Door is closed
+
+
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+    Serial.begin(115200);
+
+    // Set pin modes
+    pinMode(LATCH_SERVO_PIN, OUTPUT);
+    pinMode(DOOR_SERVO_PIN, OUTPUT);
+
+    // Attach servos
+    latchServo.attach(LATCH_SERVO_PIN);
+    doorServo.attach(DOOR_SERVO_PIN);
+
+    // Write start position
+    latchServo.write(closeAngle);
+    doorServo.write(closeAngle);
+
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-}
+    delay(10000); // Sets delay for robot cleaning cycle
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
-}
+    latchServo.write(openAngle); // turns the latch servo 90 degrees
+
+    delay(2000); // Delay, door cant open till latch is open
+    
+    doorServo.write(openAngle); // opens the door
+
+    doorOpen = true; // sets door condition to open

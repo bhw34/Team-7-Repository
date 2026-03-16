@@ -22,8 +22,6 @@ void setup() {
     latchServo.setPeriodHertz(50);
     doorServo.setPeriodHertz(50);
 
-    // 3. Attach using the full parameter list (Pin, Min, Max)
-    // The ESP32 often needs the 500-2400 microsecond range explicitly defined
     if (!latchServo.attach(LATCH_SERVO_PIN, 500, 2400)) {
         Serial.println("Latch Servo failed to attach");
     }

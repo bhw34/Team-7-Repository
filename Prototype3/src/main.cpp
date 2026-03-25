@@ -15,7 +15,7 @@ Servo latchServo;
 Servo doorServo;
 
 int closeAngle = 0; // Initializes int to store starting servo position
-int openAngle = 90; // Initializes int to store open servo position
+int openAngle = -120; // Initializes int to store open servo position
 
 
 void setup() {
@@ -48,9 +48,13 @@ void loop() {
     delay(2000); // Delay, door cant open till latch is open
     latchServo.write(openAngle); // turns the latch servo 90 degrees
 
+    Serial.println("Latch opened.");
+
     delay(2000); // Sets delay for robot cleaning cycle
     doorServo.write(openAngle); // turns the door servo 90 degrees
 
+    Serial.println("Door opened.");
+    
     Serial.println(digitalRead(sensorPin));  // Read the digital value from the sensor and print it to the serial monitor
     if (digitalRead(sensorPin) == LOW) { // Check if the sensor detects an obstacle
         Serial.println("Robot passed door.");

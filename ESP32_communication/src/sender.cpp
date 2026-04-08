@@ -2,7 +2,6 @@
 #include <WiFi.h>
 
 // REPLACE WITH YOUR RECEIVER MAC Address
-// ex MAC adress: 30:AE:A4:07:0D:64
 // ESP 24: 00:4b:12:be:cf:38
 // ESP 28: f4:65:0b:33:52:e4
 

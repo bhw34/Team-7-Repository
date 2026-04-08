@@ -22,7 +22,7 @@ int openAngle = 90; // Initializes int to store open servo position
 bool flag = true;
 unsigned long startTime = 0;
 const unsigned long delayTime = 25000;
-bool stopLoop = false;
+bool stopLoop = true;
 
 // Structure example to receive data
 // Must match the sender structure
@@ -38,7 +38,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   memcpy(&myData, incomingData, sizeof(myData));
   Serial.print("Received");
   delay(10000);
-  stopLoop = true;
+  stopLoop = false;
   
 }
 

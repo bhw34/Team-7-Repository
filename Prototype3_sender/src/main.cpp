@@ -4,6 +4,8 @@ This protype opens the latch and door motor. This is done using 2 servos one for
 
 #include <Arduino.h>
 #include <ESP32Servo.h>
+#include <esp_now.h>
+#include <WiFi.h>
 
 // This initializes the output pins for both the servos
 const int LATCH_SERVO_PIN = A1; // Latch Servo Pin
@@ -18,6 +20,30 @@ int closeAngle = 0; // Initializes int to store starting servo position
 int openAngle = 90; // Initializes int to store open servo position
 
 bool flag = true;
+
+// REPLACE WITH YOUR RECEIVER MAC Address
+// ESP 24: 00:4b:12:be:cf:38
+// ESP 28: f4:65:0b:33:52:e4
+
+uint8_t broadcastAddress[] = {0x00, 0x4B, 0x12, 0xBE, 0xCF, 0x38};
+
+// Structure example to send data
+// Must match the receiver structure
+typedef struct struct_message {
+// define what data type needs to be sent
+  bool door;
+} struct_message;
+
+// Create a struct_message called myData
+struct_message myData;
+
+esp_now_peer_info_t peerInfo; // what is this peerInfo?
+
+// this function runs when a message is sent
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+  Serial.print("\r\nLast Packet Send Status:\t");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+}
 
 void setup() {
     Serial.begin(115200);
@@ -44,6 +70,33 @@ void setup() {
     latchServo.write(closeAngle);
     doorServo.write(closeAngle);
 
+    // Init Serial Monitor
+  Serial.begin(115200);
+ 
+  // Set device as a Wi-Fi Station
+  WiFi.mode(WIFI_STA);
+
+  // Init ESP-NOW
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("Error initializing ESP-NOW");
+    return;
+  }
+
+  // Once ESPNow is successfully Init, we will register for Send CB to
+  // get the status of Trasnmitted packet
+  esp_now_register_send_cb(esp_now_send_cb_t(OnDataSent));
+  
+  // Register peer
+  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  peerInfo.channel = 0;  
+  peerInfo.encrypt = false;
+  
+  // Add peer        
+  if (esp_now_add_peer(&peerInfo) != ESP_OK){
+    Serial.println("Failed to add peer");
+    return;
+  }
+
 }
 
 void loop() {
@@ -64,5 +117,20 @@ void loop() {
         delay(2000); // Wait for a second before checking again
         latchServo.write(closeAngle); // Close the latch if an obstacle is detected
         flag = true;
-    }
+        
+        myData.door = true;
+
+        // Send message via ESP-NOW
+        esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
+   
+         if (result == ESP_OK) {
+             Serial.println("Sent with success");
+         }
+        else {
+            Serial.println("Error sending the data");
+        }
+        delay(2000);
+     }
+
+    
 }

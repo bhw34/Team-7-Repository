@@ -4,6 +4,8 @@ This protype opens the latch and door motor. This is done using 2 servos one for
 
 #include <Arduino.h>
 #include <ESP32Servo.h>
+#include <esp_now.h>
+#include <WiFi.h>
 
 // This initializes the output pins for both the servos
 const int LATCH_SERVO_PIN = A0; // Latch Servo Pin
@@ -21,6 +23,22 @@ bool flag = true;
 unsigned long startTime = 0;
 const unsigned long delayTime = 25000;
 bool stopLoop = false;
+
+// Structure example to receive data
+// Must match the sender structure
+typedef struct struct_message {
+    bool door;
+} struct_message;
+
+// Create a struct_message called myData
+struct_message myData;
+
+// callback function that will be executed when data is received
+void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+  memcpy(&myData, incomingData, sizeof(myData));
+  Serial.print("Received");
+  
+}
 
 void setup() {
     Serial.begin(115200);

@@ -6,8 +6,8 @@ This protype opens the latch and door motor. This is done using 2 servos one for
 #include <ESP32Servo.h>
 
 // This initializes the output pins for both the servos
-const int LATCH_SERVO_PIN = A1; // Latch Servo Pin
-const int DOOR_SERVO_PIN = A0; // Door Servo Pin
+const int LATCH_SERVO_PIN = A0; // Latch Servo Pin
+const int DOOR_SERVO_PIN = A1; // Door Servo Pin
 const int sensorPin = A2; // Define the pin numbers for the Infrared obstacle avoidance sensor
 
 // Initializes the servos
@@ -18,6 +18,9 @@ int closeAngle = 0; // Initializes int to store starting servo position
 int openAngle = 90; // Initializes int to store open servo position
 
 bool flag = true;
+unsigned long startTime = 0;
+const unsigned long delayTime = 25000;
+bool stopLoop = false;
 
 void setup() {
     Serial.begin(115200);
@@ -40,29 +43,45 @@ void setup() {
         Serial.println("Door Servo failed to attach");
     }
 
+    startTime = millis();
     // Write start position
-    latchServo.write(closeAngle);
     doorServo.write(closeAngle);
+    delay(2000);
+    latchServo.write(openAngle);
 
 }
 
 void loop() {
-    if (flag) {
-        flag = false;
-        delay(5000); // Delay, door cant open till latch is open
-        latchServo.write(openAngle); // turns the latch servo 90 degrees
+    while (!stopLoop) {
+        if (flag || (millis() - startTime >= delayTime)) {
+            flag = false;
+            Serial.println("Time:" + String(millis() - startTime));
 
-        delay(2000); // Sets delay for robot cleaning cycle
-        doorServo.write(openAngle); // turns the door servo 90 degrees
+            delay(5000); // Delay, door cant open till latch is open
+            latchServo.write(closeAngle); // turns the latch servo 90 degrees
 
-    }
-        Serial.println(digitalRead(sensorPin));  // Read the digital value from the sensor and print it to the serial monitor
-    if (digitalRead(sensorPin) == LOW) { // Check if the sensor detects an obstacle
-        // Serial.println("Robot passed door.");
-        delay(4000);
-        doorServo.write(closeAngle); // Close the door if an obstacle is detected
-        delay(2000); // Wait for a second before checking again
-        latchServo.write(closeAngle); // Close the latch if an obstacle is detected
-        flag = true;
+            delay(2000); // Sets delay for robot cleaning cycle
+            doorServo.write(openAngle); // turns the door servo 90 degrees
+
+            if (millis() - startTime >= delayTime) {
+                Serial.println("delay time reached");
+            }
+            delay(1000);
+        }
+        
+        Serial.println("Sensor Value: " + String(digitalRead(sensorPin)));  // Read the digital value from the sensor and print it to the serial monitor
+        if (digitalRead(sensorPin) == LOW || (millis() - startTime >= delayTime)) { // Check if the sensor detects an obstacle
+            Serial.println("Robot passed door.");
+            delay(4000);
+            doorServo.write(closeAngle); // Close the door if an obstacle is detected
+            delay(2000); // Wait for a second before checking again
+            latchServo.write(openAngle); // Close the latch if an obstacle is detected
+            flag = true;
+            delay(5000);
+        }
+
+        if (millis() - startTime >= delayTime) {
+            stopLoop = true;
+        }
     }
 }

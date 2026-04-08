@@ -5,7 +5,7 @@
 // ex MAC adress: 30:AE:A4:07:0D:64
 // ESP 24: 00:4b:12:be:cf:38
 
-uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+uint8_t broadcastAddress[] = {0x00, 0x4B, 0x12, 0xBE, 0xCF, 0x38};
 
 // Structure example to send data
 // Must match the receiver structure

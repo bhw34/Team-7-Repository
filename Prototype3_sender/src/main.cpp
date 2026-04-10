@@ -20,6 +20,7 @@ int closeAngle = 90; // Initializes int to store starting servo position
 int openAngle = 0; // Initializes int to store open servo position
 
 bool flag = true;
+bool stopLoop = false;
 
 // REPLACE WITH YOUR RECEIVER MAC Address
 // ESP 24: 00:4b:12:be:cf:38
@@ -100,7 +101,8 @@ void setup() {
 }
 
 void loop() {
-    if (flag) {
+   while (!stopLoop) {
+      if (flag) {
         flag = false;
         delay(5000); // Delay, door cant open till latch is open
         latchServo.write(openAngle); // turns the latch servo 90 degrees
@@ -117,6 +119,7 @@ void loop() {
         delay(2000); // Wait for a second before checking again
         latchServo.write(closeAngle); // Close the latch if an obstacle is detected
         flag = true;
+        stopLoop = true;
         
         myData.door = true;
 
@@ -131,6 +134,6 @@ void loop() {
         }
         delay(2000);
      }
-
+   }
     
 }

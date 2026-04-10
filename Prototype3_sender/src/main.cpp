@@ -16,8 +16,8 @@ const int sensorPin = A2; // Define the pin numbers for the Infrared obstacle av
 Servo latchServo;
 Servo doorServo;
 
-int closeAngle = 0; // Initializes int to store starting servo position
-int openAngle = 90; // Initializes int to store open servo position
+int closeAngle = 90; // Initializes int to store starting servo position
+int openAngle = 0; // Initializes int to store open servo position
 
 bool flag = true;
 

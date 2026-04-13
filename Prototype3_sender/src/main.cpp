@@ -26,7 +26,7 @@ bool stopLoop = false;
 // ESP 24: 00:4b:12:be:cf:38
 // ESP 28: f4:65:0b:33:52:e4
 
-uint8_t broadcastAddress[] = {0x00, 0x4B, 0x12, 0xBE, 0xCF, 0x38};
+uint8_t broadcastAddress[] = {0xF4, 0x65, 0x0B, 0x33, 0x52, 0xE4};
 
 // Structure example to send data
 // Must match the receiver structure
@@ -111,9 +111,9 @@ void loop() {
         doorServo.write(openAngle); // turns the door servo 90 degrees
 
     }
-        Serial.println(digitalRead(sensorPin));  // Read the digital value from the sensor and print it to the serial monitor
-    if (digitalRead(sensorPin) == LOW) { // Check if the sensor detects an obstacle
-        // Serial.println("Robot passed door.");
+    Serial.println(digitalRead(sensorPin));  // Read the digital value from the sensor and print it to the serial monitor
+    if (!digitalRead(sensorPin)) { // Check if the sensor detects an obstacle
+        Serial.println("Robot passed door.");
         delay(4000);
         doorServo.write(closeAngle); // Close the door if an obstacle is detected
         delay(2000); // Wait for a second before checking again
@@ -132,7 +132,6 @@ void loop() {
         else {
             Serial.println("Error sending the data");
         }
-        delay(2000);
      }
    }
     

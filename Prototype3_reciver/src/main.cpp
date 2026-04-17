@@ -42,6 +42,20 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   
 }
 
+/ REPLACE WITH YOUR RECEIVER MAC Address
+// ESP 24: 00:4b:12:be:cf:38
+// ESP 28: f4:65:0b:33:52:e4
+
+uint8_t broadcastAddress[] = {0x00, 0x4b, 0x12, 0xbe, 0xcf, 0x38};
+
+esp_now_peer_info_t peerInfo; // what is this peerInfo?
+
+// this function runs when a message is sent
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+  Serial.print("\r\nLast Packet Send Status:\t");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+}
+
 void setup() {
     Serial.begin(115200);
     pinMode(sensorPin, INPUT);  // Set sensorPin as input
@@ -113,11 +127,22 @@ void loop() {
             delay(2000); // Wait for a second before checking again
             latchServo.write(openAngle); // Close the latch if an obstacle is detected
             flag = true;
-            delay(5000);
-        }
+            delay(10000);
+            myData.door = true;
 
-        if (millis() - startTime >= delayTime) {
-            stopLoop = true;
-        }
+            // Send message via ESP-NOW
+            esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
+   
+            if (result == ESP_OK) {
+                 Serial.println("Sent with success");
+             }
+            else {
+                Serial.println("Error sending the data");
+            }
+            }
+
+            if (millis() - startTime >= delayTime) {
+                stopLoop = true;
+            }
     }
 }

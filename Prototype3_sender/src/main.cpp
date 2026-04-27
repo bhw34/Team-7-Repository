@@ -1,16 +1,13 @@
-/*
-This protype opens the latch and door motor. This is done using 2 servos one for the latch, which opens first and one for the door which opens second.
-*/
-
 #include <Arduino.h>
 #include <ESP32Servo.h>
 #include <esp_now.h>
 #include <WiFi.h>
 
 // This initializes the output pins for both the servos
-const int LATCH_SERVO_PIN = A1; // Latch Servo Pin
-const int DOOR_SERVO_PIN = A0; // Door Servo Pin
+const int LATCH_SERVO_PIN = A0; // Latch Servo Pin
+const int DOOR_SERVO_PIN = A1; // Door Servo Pin
 const int sensorPin = A2; // Define the pin numbers for the Infrared obstacle avoidance sensor
+//const int dockingPin = A3; // IR sensor at docking station
 
 // Initializes the servos
 Servo latchServo;
@@ -21,12 +18,13 @@ int openAngle = 0; // Initializes int to store open servo position
 
 bool flag = true;
 bool stopLoop = false;
+//bool robotCleaning = false;
 
 // REPLACE WITH YOUR RECEIVER MAC Address
 // ESP 24: 00:4b:12:be:cf:38
 // ESP 28: f4:65:0b:33:52:e4
 
-uint8_t broadcastAddress[] = {0xF4, 0x65, 0x0B, 0x33, 0x52, 0xE4};
+uint8_t broadcastAddress[] = {0x00, 0x4B, 0x12, 0xBE, 0xCF, 0x38};
 
 // Structure example to send data
 // Must match the receiver structure
@@ -101,17 +99,18 @@ void setup() {
 }
 
 void loop() {
+  //robotCleaning = digitalRead(dockingPin); //update whether robot is cleaning
+  //Serial.println(robotCleaning);
    while (!stopLoop) {
       if (flag) {
         flag = false;
-        delay(5000); // Delay, door cant open till latch is open
+        delay(1000); // Delay, door cant open till latch is open
         latchServo.write(openAngle); // turns the latch servo 90 degrees
 
         delay(2000); // Sets delay for robot cleaning cycle
         doorServo.write(openAngle); // turns the door servo 90 degrees
 
     }
-    Serial.println(digitalRead(sensorPin));  // Read the digital value from the sensor and print it to the serial monitor
     if (!digitalRead(sensorPin)) { // Check if the sensor detects an obstacle
         Serial.println("Robot passed door.");
         delay(4000);
@@ -132,6 +131,7 @@ void loop() {
         else {
             Serial.println("Error sending the data");
         }
+        delay(2000);
      }
    }
     
